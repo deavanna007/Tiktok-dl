@@ -5,7 +5,7 @@ import telebot
 from telebot import types
 
 # --- កំណត់ព័ត៌មានបឋម ---
-API_TOKEN = 'YOUR_TELEGRAM_BOT_TOKEN'  # ⚠️ ដាក់ Token របស់អ្នកនៅទីនេះ
+API_TOKEN = '8793230190:AAG16cBXtVAm8tSFSC9zE6CNBgnIq5qEO8U'  # ⚠️ ដាក់ Token របស់អ្នកនៅទីនេះ
 ADMIN_ID = 6953887858  # Telegram Admin ID
 DB_FILE = 'users.json'
 
