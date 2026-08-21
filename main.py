@@ -86,7 +86,7 @@ def broadcast_msg(message):
             try:
                 bot.send_message(
                     user_id,
-                    f"📢 *ដំណឹងពី Admin:*\n\n{msg_text}",
+                    f"📢 *ដំណឹងពី Admin:\n\n{msg_text}",
                     parse_mode='Markdown'
                 )
                 count += 1
