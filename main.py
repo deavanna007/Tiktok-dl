@@ -58,7 +58,7 @@ def show_stats(message):
                 users = json.load(f)
             bot.reply_to(
                 message,
-                f"📊 *ស្ថិតិប្រព័ន្ធ៖*\nអ្នកប្រើប្រាស់សរុប: `{len(users)}` នាក់",
+                f"📊 *ស្ថិតិប្រព័ន្ធ៖*\nអ្នកប្រើប្រាស់សរុប: {len(users)} នាក់",
                 parse_mode='Markdown'
             )
         else:
@@ -86,7 +86,7 @@ def broadcast_msg(message):
             try:
                 bot.send_message(
                     user_id,
-                    f"📢 *ដំណឹងពី Admin ({DEVELOPER_NAME}):*\n\n{msg_text}",
+                    f"📢 *ដំណឹងពី Admin:*\n\n{msg_text}",
                     parse_mode='Markdown'
                 )
                 count += 1
@@ -122,7 +122,7 @@ def handle_tiktok(message):
                 media_group = []
                 for index, img_url in enumerate(images):
                     if len(media_group) == 0:
-                        caption = f"🖼️ *{title}*\n\n👤 *By:* `{DEVELOPER_NAME}`"
+                        caption = f"🖼️ *{title}*\n\n👤 *By:* {DEVELOPER_NAME}"
                         media_group.append(types.InputMediaPhoto(media=img_url, caption=caption, parse_mode='Markdown'))
                     else:
                         media_group.append(types.InputMediaPhoto(media=img_url))
@@ -137,7 +137,7 @@ def handle_tiktok(message):
                         data['music'],
                         title=title,
                         performer=DEVELOPER_NAME,
-                        caption=f"🎵 *ចម្រៀងអមរូបថត៖* {title}\n👤 *By:* `{DEVELOPER_NAME}`",
+                        caption=f"🎵 *ចម្រៀងអមរូបថត៖* {title}\n👤 *By:* {DEVELOPER_NAME}",
                         parse_mode='Markdown'
                     )
 
@@ -156,7 +156,7 @@ def handle_tiktok(message):
                 markup.add(btn_v, btn_a)
 
                 bot.edit_message_text(
-                    f"✨ *{title}*\n\nសូមជ្រើសរើសប្រភេទឯកសារដែលអ្នកចង់បាន៖\n👨‍💻 *Bot by:* `{DEVELOPER_NAME}`",
+                    f"✨ *{title}*\n\nសូមជ្រើសរើសប្រភេទឯកសារដែលអ្នកចង់បាន៖\n👨‍💻 *Bot by:* {DEVELOPER_NAME}",
                     chat_id=message.chat.id,
                     message_id=status_msg.message_id,
                     reply_markup=markup,
@@ -183,10 +183,10 @@ def callback_query(call):
         bot.answer_callback_query(call.id, 'កំពុងផ្ញើឯកសារ...')
 
         if action == 'vid':
-            caption = f"🎬 *{media_info['title']}*\n\n⚡ *Downloaded via Bot by:* `{DEVELOPER_NAME}`"
+            caption = f"🎬 *{media_info['title']}*\n\n⚡ *Downloaded via Bot by:* {DEVELOPER_NAME}"
             bot.send_video(chat_id, media_info['video'], caption=caption, parse_mode='Markdown')
         elif action == 'aud':
-            caption = f"🎵 *{media_info['title']}*\n\n🎧 *Audio Extracted by:* `{DEVELOPER_NAME}`"
+            caption = f"🎵 *{media_info['title']}*\n\n🎧 *Audio Extracted by:* {DEVELOPER_NAME}"
             bot.send_audio(chat_id, media_info['music'], title=media_info['title'], performer=DEVELOPER_NAME, caption=caption, parse_mode='Markdown')
 
         bot.delete_message(chat_id, call.message.message_id)
