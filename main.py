@@ -45,7 +45,7 @@ def send_welcome(message):
     save_user(message.chat.id)
     welcome_text = (
         f"👋 *សួស្តី!* ខ្ញុំជា Bot ទាញយកវីដេអូ និងរូបថត (Photo Slides) ពី TikTok គ្មាន Watermark。\n\n"
-        f"👨‍💻 *អភិវឌ្ឍន៍ដោយ:* `{DEVELOPER_NAME}`\n\n"
+        f"👨‍💻 *អភិវឌ្ឍន៍ដោយ:* {DEVELOPER_NAME}\n\n"
         f"👉 *សូមផ្ញើ Link TikTok មកខ្ញុំឥឡូវនេះ!*"
     )
     bot.reply_to(message, welcome_text, parse_mode='Markdown')
