@@ -69,28 +69,33 @@ def broadcast_msg(message):
     if message.chat.id == ADMIN_ID:
         msg_text = message.text.replace('/broadcast', '').strip()
         if not msg_text:
-            bot.reply_to(message, "សូមវាយសារដែលអ្នកចង់ផ្ញើ!", parse_mode='Markdown')
+            bot.reply_to(message, "⚠️ សូមវាយសារដែលអ្នកចង់ផ្ញើ!", parse_mode='Markdown')
             return
 
         if not os.path.exists(DB_FILE):
             bot.reply_to(message, "❌ គ្មានអ្នកប្រើប្រាស់នៅក្នុង Database!")
             return
 
-        with open(DB_FILE, 'r', encoding='utf-8') as f:
-            users = json.load(f)
+        try:
+            with open(DB_FILE, 'r', encoding='utf-8') as f:
+                users = json.load(f)
+        except Exception as e:
+            bot.reply_to(message, f"❌ បរាជ័យក្នុងការអាន Database: {e}")
+            return
 
         count = 0
         bot.send_message(ADMIN_ID, "🚀 *កំពុងចាប់ផ្តើមផ្ញើសារ...*", parse_mode='Markdown')
 
         for user_id in users:
             try:
+                # បំលែង user_id ទៅជា int និងមិនប្រើ parse_mode ដើម្បីការពារ Error សញ្ញា _ ឬ Link
                 bot.send_message(
-                    user_id,
-                    f"📢 *ដំណឹងពី Admin:\n\n{msg_text}",
-                    parse_mode='Markdown'
+                    int(user_id),
+                    f"📢 ដំណឹងពី Admin:\n\n{msg_text}"
                 )
                 count += 1
-            except Exception:
+            except Exception as e:
+                print(f"Failed to send to {user_id}: {e}")
                 continue
 
         bot.send_message(ADMIN_ID, f"✅ បានផ្ញើទៅកាន់អ្នកប្រើប្រាស់ `{count}` នាក់រួចរាល់!", parse_mode='Markdown')
