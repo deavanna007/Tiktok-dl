@@ -21,7 +21,7 @@ def run_web_server():
 API_TOKEN = '8793230190:AAG16cBXtVAm8tSFSC9zE6CNBgnIq5qEO8U'
 ADMIN_ID = 6953887858
 DB_FILE = 'users.json'
-DEVELOPER_NAME = 'Dea Vanna'
+DEVELOPER_NAME = '@deavanna1'
 
 bot = telebot.TeleBot(API_TOKEN)
 media_cache = {}
