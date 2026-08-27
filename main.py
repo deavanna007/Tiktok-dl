@@ -104,27 +104,47 @@ def broadcast_msg(message):
 def handle_tiktok(message):
     save_user(message.chat.id)
     
-    # សម្អាត Link
+    # 1. សម្អាត Link កាត់ Parameter ?is_from_webapp... ចោល
     raw_url = message.text.strip()
-    url = raw_url.split('?')[0]
+    clean_url = raw_url.split('?')[0]
     
     status_msg = bot.reply_to(message, "🔎 *កំពុងទាញយកទិន្នន័យ សូមរង់ចាំមួយភ្លែត...*", parse_mode='Markdown')
 
+    res_data = None
+    headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)'}
+
+    # 2. ព្យាយាមទាញតាម TikWM (Primary API)
     try:
-        # បន្ថែម Headers ការពារ TikWM Block
-        headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)'}
-        api_url = f"https://www.tikwm.com/api/?url={url}"
-        res = requests.get(api_url, headers=headers, timeout=10).json()
-        
-        # ... កូដខាងក្រោមទុកដដែល ...
+        api_url = f"https://www.tikwm.com/api/?url={clean_url}"
+        response = requests.get(api_url, headers=headers, timeout=12)
+        if response.status_code == 200:
+            res_json = response.json()
+            if res_json.get('code') == 0:
+                res_data = res_json['data']
+    except Exception as e:
+        print(f"TikWM API failed: {e}")
 
-        if res.get('code') == 0:
-            data = res['data']
-            v_id = data['id']
-            title = data.get('title', 'TikTok Content')
+    # 3. ប្រសិនបើ TikWM បរាជ័យ ប្រើ TikWM ជាមួយ Raw URL ម្ដងទៀត
+    if not res_data:
+        try:
+            api_url = f"https://www.tikwm.com/api/?url={raw_url}"
+            response = requests.get(api_url, headers=headers, timeout=12)
+            if response.status_code == 200:
+                res_json = response.json()
+                if res_json.get('code') == 0:
+                    res_data = res_json['data']
+        except Exception as e:
+            print(f"TikWM Raw URL failed: {e}")
 
-            if 'images' in data and data['images']:
-                images = data['images']
+    # 4. ប្រសិនបើទាញបានទិន្នន័យ ដំណើរការផ្ញើឯកសារ
+    if res_data:
+        try:
+            v_id = res_data.get('id', 'media')
+            title = res_data.get('title', 'TikTok Content')
+
+            # ករណីជារូបថត (Photo Slides)
+            if 'images' in res_data and res_data['images']:
+                images = res_data['images']
                 try:
                     bot.edit_message_text(
                         f"🖼️ *រកឃើញរូបថតចំនួន {len(images)} សន្លឹក!* កំពុងផ្ញើជូន...",
@@ -147,10 +167,10 @@ def handle_tiktok(message):
                         bot.send_media_group(message.chat.id, media_group)
                         media_group = []
 
-                if 'music' in data:
+                if 'music' in res_data and res_data['music']:
                     bot.send_audio(
                         message.chat.id,
-                        data['music'],
+                        res_data['music'],
                         title=title,
                         performer='Dea Vanna',
                         caption=f"🎵 *ចម្រៀងអមរូបថត៖* {title}\n👤 *By:* {DEVELOPER_NAME}",
@@ -162,10 +182,11 @@ def handle_tiktok(message):
                 except Exception:
                     pass
 
+            # ករណីជា Video
             else:
                 media_cache[v_id] = {
-                    'video': data['play'],
-                    'music': data['music'],
+                    'video': res_data.get('play'),
+                    'music': res_data.get('music'),
                     'title': title,
                 }
 
@@ -189,18 +210,18 @@ def handle_tiktok(message):
                         reply_markup=markup,
                         parse_mode='Markdown'
                     )
-
-        else:
+        except Exception as err:
+            print(f"Error processing media: {err}")
             try:
-                bot.edit_message_text("❌ *មិនអាចទាញយកបានទេ!* សូមពិនិត្យ Link ឡើងវិញ。", chat_id=message.chat.id, message_id=status_msg.message_id, parse_mode='Markdown')
+                bot.edit_message_text("⚠️ *មានបញ្ហាក្នុងការរៀបចំឯកសារ!*", chat_id=message.chat.id, message_id=status_msg.message_id, parse_mode='Markdown')
             except Exception:
-                bot.send_message(message.chat.id, "❌ *មិនអាចទាញយកបានទេ!* សូមពិនិត្យ Link ឡើងវិញ。", parse_mode='Markdown')
-    except Exception as e:
-        try:
-            bot.edit_message_text("⚠️ *មានបញ្ហាក្នុងការភ្ជាប់ទៅកាន់ Server!*", chat_id=message.chat.id, message_id=status_msg.message_id, parse_mode='Markdown')
-        except Exception:
-            bot.send_message(message.chat.id, "⚠️ *មានបញ្ហាក្នុងការភ្ជាប់ទៅកាន់ Server!*", parse_mode='Markdown')
+                bot.send_message(message.chat.id, "⚠️ *មានបញ្ហាក្នុងការរៀបចំឯកសារ!*", parse_mode='Markdown')
 
+    else:
+        try:
+            bot.edit_message_text("❌ *មិនអាចទាញយកបានទេ!* API TikWM អាចនឹងរវល់ ឬ Link មិនត្រឹមត្រូវ។", chat_id=message.chat.id, message_id=status_msg.message_id, parse_mode='Markdown')
+        except Exception:
+            bot.send_message(message.chat.id, "❌ *មិនអាចទាញយកបានទេ!* API TikWM អាចនឹងរវល់ ឬ Link មិនត្រឹមត្រូវ។", parse_mode='Markdown')
 @bot.callback_query_handler(func=lambda call: True)
 def callback_query(call):
     try:
