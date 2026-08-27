@@ -117,12 +117,15 @@ def handle_tiktok(message):
 
             if 'images' in data and data['images']:
                 images = data['images']
-                bot.edit_message_text(
-                    f"🖼️ *រកឃើញរូបថតចំនួន {len(images)} សន្លឹក!* កំពុងផ្ញើជូន...",
-                    chat_id=message.chat.id,
-                    message_id=status_msg.message_id,
-                    parse_mode='Markdown'
-                )
+                try:
+                    bot.edit_message_text(
+                        f"🖼️ *រកឃើញរូបថតចំនួន {len(images)} សន្លឹក!* កំពុងផ្ញើជូន...",
+                        chat_id=message.chat.id,
+                        message_id=status_msg.message_id,
+                        parse_mode='Markdown'
+                    )
+                except Exception:
+                    pass
 
                 media_group = []
                 for index, img_url in enumerate(images):
@@ -141,12 +144,15 @@ def handle_tiktok(message):
                         message.chat.id,
                         data['music'],
                         title=title,
-                        performer=DEVELOPER_NAME,
+                        performer='Dea Vanna',
                         caption=f"🎵 *ចម្រៀងអមរូបថត៖* {title}\n👤 *By:* {DEVELOPER_NAME}",
                         parse_mode='Markdown'
                     )
 
-                bot.delete_message(message.chat.id, status_msg.message_id)
+                try:
+                    bot.delete_message(message.chat.id, status_msg.message_id)
+                except Exception:
+                    pass
 
             else:
                 media_cache[v_id] = {
@@ -160,18 +166,32 @@ def handle_tiktok(message):
                 btn_a = types.InlineKeyboardButton('🎵 Audio (MP3)', callback_data=f'aud_{v_id}')
                 markup.add(btn_v, btn_a)
 
-                bot.edit_message_text(
-                    f"✨ *{title}*\n\nសូមជ្រើសរើសប្រភេទឯកសារដែលអ្នកចង់បាន៖\n👨‍💻 *Bot by:* {DEVELOPER_NAME}",
-                    chat_id=message.chat.id,
-                    message_id=status_msg.message_id,
-                    reply_markup=markup,
-                    parse_mode='Markdown'
-                )
+                try:
+                    bot.edit_message_text(
+                        f"✨ *{title}*\n\nសូមជ្រើសរើសប្រភេទឯកសារដែលអ្នកចង់បាន៖\n👨‍💻 *Bot by:* {DEVELOPER_NAME}",
+                        chat_id=message.chat.id,
+                        message_id=status_msg.message_id,
+                        reply_markup=markup,
+                        parse_mode='Markdown'
+                    )
+                except Exception:
+                    bot.send_message(
+                        message.chat.id,
+                        f"✨ *{title}*\n\nសូមជ្រើសរើសប្រភេទឯកសារដែលអ្នកចង់បាន៖\n👨‍💻 *Bot by:* {DEVELOPER_NAME}",
+                        reply_markup=markup,
+                        parse_mode='Markdown'
+                    )
 
         else:
-            bot.edit_message_text("❌ *មិនអាចទាញយកបានទេ!* សូមពិនិត្យ Link ឡើងវិញ。", chat_id=message.chat.id, message_id=status_msg.message_id, parse_mode='Markdown')
+            try:
+                bot.edit_message_text("❌ *មិនអាចទាញយកបានទេ!* សូមពិនិត្យ Link ឡើងវិញ。", chat_id=message.chat.id, message_id=status_msg.message_id, parse_mode='Markdown')
+            except Exception:
+                bot.send_message(message.chat.id, "❌ *មិនអាចទាញយកបានទេ!* សូមពិនិត្យ Link ឡើងវិញ。", parse_mode='Markdown')
     except Exception as e:
-        bot.edit_message_text("⚠️ *មានបញ្ហាក្នុងការភ្ជាប់ទៅកាន់ Server!*", chat_id=message.chat.id, message_id=status_msg.message_id, parse_mode='Markdown')
+        try:
+            bot.edit_message_text("⚠️ *មានបញ្ហាក្នុងការភ្ជាប់ទៅកាន់ Server!*", chat_id=message.chat.id, message_id=status_msg.message_id, parse_mode='Markdown')
+        except Exception:
+            bot.send_message(message.chat.id, "⚠️ *មានបញ្ហាក្នុងការភ្ជាប់ទៅកាន់ Server!*", parse_mode='Markdown')
 
 @bot.callback_query_handler(func=lambda call: True)
 def callback_query(call):
