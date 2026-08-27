@@ -103,12 +103,20 @@ def broadcast_msg(message):
 @bot.message_handler(func=lambda message: "tiktok.com" in message.text)
 def handle_tiktok(message):
     save_user(message.chat.id)
-    url = message.text.strip()
+    
+    # សម្អាត Link
+    raw_url = message.text.strip()
+    url = raw_url.split('?')[0]
+    
     status_msg = bot.reply_to(message, "🔎 *កំពុងទាញយកទិន្នន័យ សូមរង់ចាំមួយភ្លែត...*", parse_mode='Markdown')
 
     try:
+        # បន្ថែម Headers ការពារ TikWM Block
+        headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)'}
         api_url = f"https://www.tikwm.com/api/?url={url}"
-        res = requests.get(api_url).json()
+        res = requests.get(api_url, headers=headers, timeout=10).json()
+        
+        # ... កូដខាងក្រោមទុកដដែល ...
 
         if res.get('code') == 0:
             data = res['data']
